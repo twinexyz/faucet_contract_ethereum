@@ -155,7 +155,7 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         }
 
         // Enforce cooldown: revert if current time is before the allowed next claim time
-        uint64 nextTime = nextClaimTime(token, msg.sender);
+        uint64 nextTime = nextClaimTime(token, to);
         if (nextTime != 0 && block.timestamp < nextTime) {
             // Calculate remaining seconds and revert with CooldownActive error
             uint256 remaining = nextTime - uint64(block.timestamp);
@@ -177,7 +177,7 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         IERC20(token).safeTransfer(to, amount);
 
         // Record the claim time for cooldown tracking
-        lastClaimAt[token][msg.sender] = uint64(block.timestamp);
+        lastClaimAt[token][to] = uint64(block.timestamp);
 
         emit Claimed(msg.sender, token, to, amount, uint64(block.timestamp));
     }
