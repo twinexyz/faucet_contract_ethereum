@@ -8,7 +8,7 @@ import {Faucet} from "src/Faucet.sol";
 
 contract SetTokenConfig is Script {
     Faucet faucet;
-    address faucetAddress;
+    address payable faucetAddress;
 
     address token;
     bool enabled;
@@ -29,7 +29,7 @@ contract SetTokenConfig is Script {
         );
 
         string memory json = vm.readFile(path);
-        faucetAddress = vm.parseJsonAddress(json, ".faucetContract");
+        faucetAddress = payable(vm.parseJsonAddress(json, ".faucetContract"));
         faucet = Faucet(faucetAddress);
 
        
@@ -48,7 +48,7 @@ contract SetTokenConfig is Script {
 
 contract GetTokenConfig is Script {
     Faucet faucet;
-    address faucetAddress;
+    address payable faucetAddress;
 
     address token;
 
@@ -63,15 +63,13 @@ contract GetTokenConfig is Script {
         );
 
         string memory json = vm.readFile(path);
-        faucetAddress = vm.parseJsonAddress(json, ".faucetContract");
+        faucetAddress = payable(vm.parseJsonAddress(json, ".faucetContract"));
         faucet = Faucet(faucetAddress);
 
     }
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
-        address admin = vm.addr(pk);
-
         vm.startBroadcast(pk);
 
         Faucet.TokenConfig memory config = faucet.getTokenConfig(token);
@@ -87,7 +85,7 @@ contract GetTokenConfig is Script {
 
 contract Claim is Script {
     Faucet faucet;
-    address faucetAddress;
+    address payable faucetAddress;
 
     address token;
     address to;
@@ -104,13 +102,12 @@ contract Claim is Script {
         );
 
         string memory json = vm.readFile(path);
-        faucetAddress = vm.parseJsonAddress(json, ".faucetContract");
+        faucetAddress = payable(vm.parseJsonAddress(json, ".faucetContract"));
         faucet = Faucet(faucetAddress);
     }
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
-        address admin = vm.addr(pk);
 
         vm.startBroadcast(pk);
 

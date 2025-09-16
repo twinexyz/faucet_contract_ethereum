@@ -13,6 +13,7 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
 
     // ===== Errors =====
     error TokenDisabled();
+    error ETHTransferFailed();
     error CooldownActive(uint256 secondsRemaining);
     error InsufficientFaucetBalance();
 
@@ -49,6 +50,9 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         // If initialOwner is zero, default to deployer. Owner is set via Ownable constructor.
     }
 
+    /// @notice Allow the faucet to receive ETH directly
+    receive() external payable {}
+
     // ===== Admin Functions =====
 
     /**
@@ -64,7 +68,6 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         uint256 dropAmount,
         uint256 cooldownSeconds
     ) external onlyOwner {
-        require(token != address(0), "TOKEN_ZERO_ADDR");
         tokenConfigs[token] = TokenConfig({
             enabled: enabled,
             dropAmount: uint128(dropAmount),
@@ -155,7 +158,7 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         }
 
         // Enforce cooldown: revert if current time is before the allowed next claim time
-        uint64 nextTime = nextClaimTime(token, msg.sender);
+        uint64 nextTime = nextClaimTime(token, to);
         if (nextTime != 0 && block.timestamp < nextTime) {
             // Calculate remaining seconds and revert with CooldownActive error
             uint256 remaining = nextTime - uint64(block.timestamp);
@@ -168,16 +171,25 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
             revert TokenDisabled();
         }
 
-        // Check faucet balance for the token
-        if (IERC20(token).balanceOf(address(this)) < amount) {
-            revert InsufficientFaucetBalance();
+        if (token == address(0)) {
+            // Native Token Claim
+            if(address(this).balance < amount) {
+                revert InsufficientFaucetBalance();
+            }  
+            // Transfer native token to the recipient
+            (bool success, ) = to.call{value: amount}("");
+            if (!success) revert ETHTransferFailed();   
+        } else {
+            // ERC20 Token Claim
+            if (IERC20(token).balanceOf(address(this)) < amount) {
+                revert InsufficientFaucetBalance();
+            }
+            // Transfer tokens to the recipient
+            IERC20(token).safeTransfer(to, amount);
         }
-
-        // Transfer tokens to the recipient
-        IERC20(token).safeTransfer(to, amount);
-
+    
         // Record the claim time for cooldown tracking
-        lastClaimAt[token][msg.sender] = uint64(block.timestamp);
+        lastClaimAt[token][to] = uint64(block.timestamp);
 
         emit Claimed(msg.sender, token, to, amount, uint64(block.timestamp));
     }
