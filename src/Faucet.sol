@@ -50,6 +50,9 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         // If initialOwner is zero, default to deployer. Owner is set via Ownable constructor.
     }
 
+    /// @notice Allow the faucet to receive ETH directly
+    receive() external payable {}
+
     // ===== Admin Functions =====
 
     /**
@@ -65,7 +68,6 @@ contract Faucet is Ownable2Step, Pausable, ReentrancyGuard {
         uint256 dropAmount,
         uint256 cooldownSeconds
     ) external onlyOwner {
-        require(token != address(0), "TOKEN_ZERO_ADDR");
         tokenConfigs[token] = TokenConfig({
             enabled: enabled,
             dropAmount: uint128(dropAmount),
