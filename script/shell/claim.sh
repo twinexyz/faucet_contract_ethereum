@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Default values
-PRIVATE_KEY="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-DEFAULT_FORK_URL="127.0.0.1:8545"
+PRIVATE_KEY="0x63ff47b31d047d471229d35e0e2b829708dde1f1e438bfaf1059d0de785dedc1"
+DEFAULT_FORK_URL="https://ethereum-sepolia-rpc.publicnode.com"
 
 # Read variables from user
 read -p "Chain Name: " CHAIN_NAME

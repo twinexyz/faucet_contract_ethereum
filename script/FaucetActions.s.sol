@@ -70,8 +70,6 @@ contract GetTokenConfig is Script {
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
-        address admin = vm.addr(pk);
-
         vm.startBroadcast(pk);
 
         Faucet.TokenConfig memory config = faucet.getTokenConfig(token);
@@ -110,7 +108,6 @@ contract Claim is Script {
 
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
-        address admin = vm.addr(pk);
 
         vm.startBroadcast(pk);
 
