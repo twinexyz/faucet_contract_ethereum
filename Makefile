@@ -1,7 +1,3 @@
-# Update default values
-updateDefaultValues:
-	bash script/shell/updateDefaultValues.sh
-
 # Deploy the faucet contract
 deployContract:
 	bash script/shell/deployContract.sh
