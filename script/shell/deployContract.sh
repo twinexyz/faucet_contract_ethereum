@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # Default values
-PRIVATE_KEY="0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-DEFAULT_FORK_URL="127.0.0.1:8545"
+if [ -f .env ]; then
+    set -o allexport
+    source .env
+    set +o allexport
+fi
+
 DEFAULT_ONWER_ADDRESS="0x0000000000000000000000000000000000000000"
 
 # Take owner address and chain name
@@ -20,6 +24,5 @@ export CHAIN_NAME
 
 #Run the forge script
 forge script script/FaucetDeploy.s.sol:FaucetDeploy \
-    --fork-url $DEFAULT_FORK_URL  \
-    --broadcast \
-    -- --env "PRIVATE_KEY=$PRIVATE_KEY" --env "OWNER_ADDRESS=$OWNER_ADDRESS" --evn "CHAIN_NAME=$CHAIN_NAME"
+    --fork-url "$RPC_URL"  \
+    --broadcast

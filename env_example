@@ -1,0 +1,2 @@
+PRIVATE_KEY=<Private key to deploy from>
+RPC_URL=<RPC url of the chain to deploy on>
